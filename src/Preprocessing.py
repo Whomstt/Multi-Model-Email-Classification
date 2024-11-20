@@ -6,18 +6,23 @@ import stanza
 from stanza.pipeline.core import DownloadMethod
 import re
 
+
 # Preprocessing function
 def preprocess_dataset(df, content_col, summary_col):
     # Ensure columns are treated as strings
-    df[content_col] = df[content_col].values.astype('U')
-    df[summary_col] = df[summary_col].values.astype('U')
+    df[content_col] = df[content_col].values.astype("U")
+    df[summary_col] = df[summary_col].values.astype("U")
 
     # Translation
     def trans_to_en(texts):
         t2t_m = "facebook/m2m100_418M"
         model = M2M100ForConditionalGeneration.from_pretrained(t2t_m)
         tokenizer = M2M100Tokenizer.from_pretrained(t2t_m)
-        nlp_stanza = stanza.Pipeline(lang="multilingual", processors="langid", download_method=DownloadMethod.REUSE_RESOURCES)
+        nlp_stanza = stanza.Pipeline(
+            lang="multilingual",
+            processors="langid",
+            download_method=DownloadMethod.REUSE_RESOURCES,
+        )
 
         translated_texts = []
         for text in texts:
@@ -31,8 +36,12 @@ def preprocess_dataset(df, content_col, summary_col):
             if lang != "en":
                 tokenizer.src_lang = lang
                 encoded = tokenizer(text, return_tensors="pt")
-                generated_tokens = model.generate(**encoded, forced_bos_token_id=tokenizer.get_lang_id("en"))
-                translated_text = tokenizer.batch_decode(generated_tokens, skip_special_tokens=True)[0]
+                generated_tokens = model.generate(
+                    **encoded, forced_bos_token_id=tokenizer.get_lang_id("en")
+                )
+                translated_text = tokenizer.batch_decode(
+                    generated_tokens, skip_special_tokens=True
+                )[0]
             else:
                 translated_text = text
 
@@ -47,11 +56,24 @@ def preprocess_dataset(df, content_col, summary_col):
         r"(january|february|march|april|may|june|july|august|september|october|november|december)",
         r"(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)",
         r"(monday|tuesday|wednesday|thursday|friday|saturday|sunday)",
-        r"\d{2}(:|.)\d{2}", r"(\s|^).(\s|$)"
+        r"\d{2}(:|.)\d{2}",
+        r"(\s|^).(\s|$)",
     ]
     for noise in noise_patterns:
-        df[content_col] = df[content_col].str.lower().replace(noise, " ", regex=True).replace(r'\s+', ' ', regex=True).str.strip()
-        df["ts_en"] = df["ts_en"].str.lower().replace(noise, " ", regex=True).replace(r'\s+', ' ', regex=True).str.strip()
+        df[content_col] = (
+            df[content_col]
+            .str.lower()
+            .replace(noise, " ", regex=True)
+            .replace(r"\s+", " ", regex=True)
+            .str.strip()
+        )
+        df["ts_en"] = (
+            df["ts_en"]
+            .str.lower()
+            .replace(noise, " ", regex=True)
+            .replace(r"\s+", " ", regex=True)
+            .str.strip()
+        )
 
     # TF-IDF Transformation
     tfidfconverter = TfidfVectorizer(max_features=2000, min_df=4, max_df=0.90)
@@ -61,6 +83,7 @@ def preprocess_dataset(df, content_col, summary_col):
 
     return X
 
+
 # Load datasets
 appgallery_path = "/mnt/data/AppGallery.csv"
 purchasing_path = "/mnt/data/Purchasing.csv"
@@ -69,8 +92,12 @@ df_appgallery = pd.read_csv(appgallery_path)
 df_purchasing = pd.read_csv(purchasing_path)
 
 # Preprocess both datasets
-X_appgallery = preprocess_dataset(df_appgallery, "Interaction content", "Ticket Summary")
-X_purchasing = preprocess_dataset(df_purchasing, "Interaction content", "Ticket Summary")
+X_appgallery = preprocess_dataset(
+    df_appgallery, "Interaction content", "Ticket Summary"
+)
+X_purchasing = preprocess_dataset(
+    df_purchasing, "Interaction content", "Ticket Summary"
+)
 
 # Combine datasets
 X_combined = np.concatenate((X_appgallery, X_purchasing), axis=0)
