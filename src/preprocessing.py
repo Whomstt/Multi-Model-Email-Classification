@@ -5,6 +5,7 @@ from transformers import pipeline, M2M100ForConditionalGeneration, M2M100Tokeniz
 import stanza
 from stanza.pipeline.core import DownloadMethod
 import re
+import os
 
 
 # Preprocessing function
@@ -85,8 +86,12 @@ def preprocess_dataset(df, content_col, summary_col):
 
 
 # Load datasets
-appgallery_path = "/mnt/data/AppGallery.csv"
-purchasing_path = "/mnt/data/Purchasing.csv"
+appgallery_path = os.path.join(
+    os.path.dirname(__file__), "..", "data", "AppGallery.csv"
+)
+purchasing_path = os.path.join(
+    os.path.dirname(__file__), "..", "data", "Purchasing.csv"
+)
 
 df_appgallery = pd.read_csv(appgallery_path)
 df_purchasing = pd.read_csv(purchasing_path)
