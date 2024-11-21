@@ -2,6 +2,29 @@ import os
 import sys
 import subprocess
 
+# Paths for the preprocessed CSV files
+purchasing_file = "data/Purchasing_preprocessed.csv"
+appgallery_file = "data/AppGallery_preprocessed.csv"
+
+
+# Function to check if the files exist
+def check_files_exist():
+    return os.path.exists(purchasing_file) and os.path.exists(appgallery_file)
+
+
+# Run preprocessing script
+def run_preprocessing():
+    # Running the preprocessing.py script
+    subprocess.run(["python", "src/preprocessing.py"], check=True)
+
+
+# Check if preprocessed files exist, else run preprocessing
+if not check_files_exist():
+    print("Preprocessed CSV files not found. Running preprocessing...")
+    run_preprocessing()
+else:
+    print("Preprocessed CSV files found. Proceeding with the rest of the program.")
+
 
 # Run our model scripts
 def run_script(script_path):
@@ -27,7 +50,7 @@ def main():
     print("3. SGD")
     print("4. Hist Gradient Boosting")
     print("5. Random Trees Embedding")
-    choice = input("Enter 1 or 2: ").strip()
+    choice = input("Enter 1, 2, 3, 4, or 5: ").strip()
 
     base_dir = os.path.dirname(os.path.abspath(__file__))
     adaboosting_path = os.path.join(base_dir, "models", "adaboosting", "adaboosting.py")
