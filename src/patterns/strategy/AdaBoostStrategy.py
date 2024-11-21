@@ -2,11 +2,11 @@ from sklearn.ensemble import AdaBoostClassifier
 from sklearn.tree import DecisionTreeClassifier
 import joblib
 import os
+from patterns.strategy.ClassifierStrategy import ClassifierStrategy
 
-class AdaBoostStrategy(ModelStrategy):  # Ensure it inherits from ModelStrategy
+class AdaBoostStrategy(ClassifierStrategy):  # Ensure it inherits from ModelStrategy
     def __init__(self):
-        """Initialize by loading the pre-trained AdaBoost model from file."""
-        model_path = os.path.join("models", "adaboosting", "adaboost_model.pkl")
+        model_path = os.path.join("src","models", "adaboosting", "adaboost_model.pkl")
         self.model = self.load_model(model_path)
 
     def load_model(self, model_path):

@@ -1,8 +1,11 @@
 import os
 import sys
 import subprocess
+import sys
+print(sys.path)
 from patterns.strategy.ClassifierContext import ClassifierContext
 from patterns.factory.ClassifierFactory import ClassifierFactory  # Import the factory
+
 
 # Paths for the preprocessed CSV files
 purchasing_file = "data/Purchasing_preprocessed.csv"
