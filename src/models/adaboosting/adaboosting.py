@@ -1,42 +1,87 @@
-import numpy as np
 import pandas as pd
+import numpy as np
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import classification_report
+from sklearn.metrics import accuracy_score, classification_report
+from sklearn.impute import SimpleImputer
 
-# Assuming you have a 'label' column for the classification task
-# Example of creating a target label column (if not already present)
-# df_appgallery['label'] = df_appgallery['LabelColumn']
-# df_purchasing['label'] = df_purchasing['LabelColumn']
+# Function to load preprocessed data from multiple files
+def load_data(file_paths):
+    """Load and combine data from multiple preprocessed CSV files."""
+    dataframes = [pd.read_csv(file) for file in file_paths]
+    combined_df = pd.concat(dataframes, axis=0, ignore_index=True)
+    X = combined_df.iloc[:, :-1].values  # Features (all columns except the last one)
+    y = combined_df.iloc[:, -1].values   # Target (last column)
+    return X, y
 
-# Combine the labels (assuming 'label' is the column name for targets)
-y_appgallery = df_appgallery['label']
-y_purchasing = df_purchasing['label']
+# Function to handle missing values using SimpleImputer
+def handle_missing_values(X):
+    """Handle missing values in feature data."""
+    imputer = SimpleImputer(strategy='mean')  # Fill missing values with the column mean
+    X_imputed = imputer.fit_transform(X)
+    return X_imputed
 
-# Preprocess the datasets
-X_appgallery = preprocess_dataset(df_appgallery, "Interaction content", "Ticket Summary")
-X_purchasing = preprocess_dataset(df_purchasing, "Interaction content", "Ticket Summary")
+# Function to train AdaBoost classifier
+def train_adaboost(X_train, y_train):
+    """Train an AdaBoost classifier with a decision tree base estimator."""
+    # Define the base estimator
+    estimator = DecisionTreeClassifier(max_depth=1)
+    # Create the AdaBoost model
+    adaboost_model = AdaBoostClassifier(
+        estimator=estimator,
+        n_estimators=50,  # Number of weak classifiers
+        learning_rate=1.0,
+        random_state=42
+    )
+    # Train the model
+    adaboost_model.fit(X_train, y_train)
+    return adaboost_model
 
-# Combine the datasets
-X_combined = np.concatenate((X_appgallery, X_purchasing), axis=0)
-y_combined = np.concatenate((y_appgallery, y_purchasing), axis=0)
+# Function to evaluate the model
+def evaluate_model(model, X_test, y_test):
+    """Evaluate the model's performance and print metrics."""
+    y_pred = model.predict(X_test)
+    accuracy = accuracy_score(y_test, y_pred)
+    print(f"Accuracy: {accuracy:.2f}")
+    print("\nClassification Report:")
+    print(classification_report(y_test, y_pred))
 
-# Train-test split
-X_train, X_test, y_train, y_test = train_test_split(X_combined, y_combined, test_size=0.2, random_state=42)
+# Main function
+def main():
+    # Paths to your preprocessed CSV files
+    file_paths = [
+        "data/AppGallery_preprocessed.csv",
+        "data/Purchasing_preprocessed.csv"
+    ]
 
-# Initialize AdaBoost with a base DecisionTreeClassifier
-adaboost_model = AdaBoostClassifier(base_estimator=DecisionTreeClassifier(max_depth=1), n_estimators=50, random_state=42)
+    # Load the data
+    print("Loading data from files...")
+    X, y = load_data(file_paths)
 
-# Train the model
-adaboost_model.fit(X_train, y_train)
+    # Handle missing values in the data
+    print("Handling missing values...")
+    X = handle_missing_values(X)
 
-# Predict on the test set
-y_pred = adaboost_model.predict(X_test)
+    # Split the data into training and testing sets
+    print("Splitting data into training and testing sets...")
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42, stratify=y
+    )
 
-# Evaluate the model
-print(classification_report(y_test, y_pred))
+    # Train the AdaBoost model
+    print("Training AdaBoost classifier...")
+    model = train_adaboost(X_train, y_train)
 
-# Optionally: save the model using joblib or pickle
-import joblib
-joblib.dump(adaboost_model, 'adaboost_email_classifier.pkl')
+    # Evaluate the model
+    print("Evaluating the model...")
+    evaluate_model(model, X_test, y_test)
+
+    # Save the model if needed (optional)
+    # import joblib
+    # joblib.dump(model, "adaboost_model.pkl")
+    # print("Model saved to adaboost_model.pkl")
+
+# Run the script
+if __name__ == "__main__":
+    main()

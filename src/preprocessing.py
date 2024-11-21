@@ -5,17 +5,21 @@ from sklearn.model_selection import train_test_split
 from transformers import M2M100ForConditionalGeneration, M2M100Tokenizer
 import stanza
 
-
-# Function for data preprocessing
+# Updated Function for Data Preprocessing
 def preprocess_data(file_name):
     # 1. Load dataset
     df = pd.read_csv(file_name)
 
-    # Convert the dtype object to unicode string
-    df['Interaction content'] = df['Interaction content'].values.astype('U')
-    df['Ticket Summary'] = df['Ticket Summary'].values.astype('U')
+    # Drop unused or mostly empty columns
+    df = df.drop(columns=["Unnamed: 11"], errors='ignore')
 
-    # Optional: Rename variable names for easier reference
+    # Convert dtype object to unicode string for compatibility
+    if 'Interaction content' in df.columns:
+        df['Interaction content'] = df['Interaction content'].fillna('').astype(str)
+    if 'Ticket Summary' in df.columns:
+        df['Ticket Summary'] = df['Ticket Summary'].fillna('').astype(str)
+
+    # Optional: Rename variables for easier reference
     df["y1"] = df["Type 1"]
     df["y2"] = df["Type 2"]
     df["y3"] = df["Type 3"]
@@ -23,19 +27,19 @@ def preprocess_data(file_name):
     df["x"] = df['Interaction content']
     df["y"] = df["y2"]
 
-    # Remove empty y
-    df = df.loc[(df["y"] != '') & (~df["y"].isna())]
-    
+    # Remove rows with missing or empty labels
+    df = df.loc[(df["y"].notna()) & (df["y"] != '')]
+
     # 2. Data Grouping
     temp = df.copy()
-    y = temp.y.to_numpy()
+    y = temp["y"].to_numpy()
 
     # 3. Translation
     temp["ts_en"] = trans_to_en(temp["Ticket Summary"].tolist())
 
     # 4. Noise Removal
     temp["ts"] = temp["Ticket Summary"].str.lower().replace(
-        r"(sv\s*:)|(wg\s*:)|(ynt\s*:)|(fw(d)?\s*:)|(r\s*:)|(re\s*:)|(\[|\])|(aspiegel support issue submit)|(null)|(nan)|((bonus place my )?support.pt 自动回复:)", 
+        r"(sv\s*:)|(wg\s*:)|(ynt\s*:)|(fw(d)?\s*:)|(r\s*:)|(re\s*:)|(\[|\])|(aspiegel support issue submit)|(null)|(nan)|((bonus place my )?support.pt 自动回复:)",
         " ", regex=True
     ).replace(r'\s+', ' ', regex=True).str.strip()
 
@@ -56,8 +60,8 @@ def preprocess_data(file_name):
         ).replace(r'\s+', ' ', regex=True).str.strip()
 
     # Remove less frequent labels
-    good_y1 = temp.y1.value_counts()[temp.y1.value_counts() > 10].index
-    temp = temp.loc[temp.y1.isin(good_y1)]
+    good_y1 = temp["y1"].value_counts()[temp["y1"].value_counts() > 10].index
+    temp = temp.loc[temp["y1"].isin(good_y1)]
 
     # 5. Textual Data Representation
     tfidfconverter = TfidfVectorizer(max_features=2000, min_df=4, max_df=0.90)
@@ -75,7 +79,7 @@ def preprocess_data(file_name):
     X_bad = X[y_series.isin(good_y_value) == False]
 
     test_size = X.shape[0] * 0.2 / X_good.shape[0]
-    
+
     X_train, X_test, y_train, y_test = train_test_split(X_good, y_good, test_size=test_size, random_state=0)
     X_train = np.concatenate((X_train, X_bad), axis=0)
     y_train = np.concatenate((y_train, y_bad), axis=0)
@@ -93,7 +97,7 @@ def trans_to_en(texts):
     t2t_m = "facebook/m2m100_418M"
     model = M2M100ForConditionalGeneration.from_pretrained(t2t_m)
     tokenizer = M2M100Tokenizer.from_pretrained(t2t_m)
-    
+
     # Initialize Stanza pipeline for language identification
     stanza.download('multilingual')  # Ensure multilingual resources are downloaded
     nlp_stanza = stanza.Pipeline(lang="multilingual", processors="langid")
@@ -107,35 +111,32 @@ def trans_to_en(texts):
 
     text_en_l = []
     for text in texts:
-        if text == "":
+        if text == "":  # Skip empty texts
             text_en_l.append(text)
             continue
 
-        # Detect language
-        doc = nlp_stanza(text)
-        lang = doc.lang
+        try:
+            # Detect language
+            doc = nlp_stanza(text)
+            lang = doc.lang
+            lang = lang_fallback.get(lang, lang)
 
-        # Handle fallback for unsupported languages
-        lang = lang_fallback.get(lang, lang)
-
-        # Translate if not English
-        if lang != "en":
-            try:
+            # Translate if not English
+            if lang != "en":
                 tokenizer.src_lang = lang
                 encoded = tokenizer(text, return_tensors="pt")
                 generated_tokens = model.generate(
                     **encoded, forced_bos_token_id=tokenizer.get_lang_id("en")
                 )
                 text_en = tokenizer.batch_decode(generated_tokens, skip_special_tokens=True)[0]
-            except KeyError:
-                print(f"Unsupported language detected: {lang}. Skipping translation.")
-                text_en = text  # Keep original text if translation fails
-        else:
-            text_en = text
+            else:
+                text_en = text
+        except Exception as e:
+            print(f"Error processing text: {text}, {str(e)}")
+            text_en = text  # Return the original text if translation fails
 
         text_en_l.append(text_en)
     return text_en_l
-
 
 
 # Process both files
