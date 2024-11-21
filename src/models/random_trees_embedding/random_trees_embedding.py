@@ -7,6 +7,9 @@ from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 from sklearn.linear_model import LogisticRegression
+import joblib
+import os
+
 
 def load_data(file_paths):
     dataframes = [pd.read_csv(file) for file in file_paths]
@@ -68,6 +71,12 @@ def main():
     trained_model = train_and_evaluate_model(
         X_train, X_test, y_train, y_test, random_trees_pipeline
     )
+
+    # Save the model 
+    model_path = os.path.join("src","models", "random_trees_embedding", "random_trees_embedding_model.pkl")  
+    print(f"Saving the model to {model_path}...")
+    joblib.dump(trained_model, model_path)
+    print(f"Model saved to {model_path}")
 
 if __name__ == "__main__":
     main()

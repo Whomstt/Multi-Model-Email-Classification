@@ -5,6 +5,8 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, classification_report
 from sklearn.impute import SimpleImputer
+import joblib
+import os
 
 # Function to load preprocessed data from multiple files
 def load_data(file_paths):
@@ -30,9 +32,9 @@ def train_adaboost(X_train, y_train):
     # Create the AdaBoost model
     adaboost_model = AdaBoostClassifier(
         estimator=estimator,
-        n_estimators=50,  # Number of weak classifiers
-        learning_rate=1.0,
-        random_state=42
+        n_estimators=70,  # Number of weak classifiers
+        learning_rate=1.5,
+        random_state=20
     )
     # Train the model
     adaboost_model.fit(X_train, y_train)
@@ -77,10 +79,13 @@ def main():
     print("Evaluating the model...")
     evaluate_model(model, X_test, y_test)
 
-    # Save the model if needed (optional)
-    # import joblib
-    # joblib.dump(model, "adaboost_model.pkl")
-    # print("Model saved to adaboost_model.pkl")
+    
+    
+    # Save the model to the 'models/adaboosting' folder
+    model_path = os.path.join("src","models", "adaboosting", "adaboost_model.pkl")  
+    print(f"Saving the model to {model_path}...")
+    joblib.dump(model, model_path)
+    print(f"Model saved to {model_path}")
 
 # Run the script
 if __name__ == "__main__":

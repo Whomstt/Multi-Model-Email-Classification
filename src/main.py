@@ -1,6 +1,8 @@
 import os
 import sys
 import subprocess
+from patterns.strategy.ClassifierContext import ClassifierContext
+from patterns.factory.ClassifierFactory import ClassifierFactory  # Import the factory
 
 # Paths for the preprocessed CSV files
 purchasing_file = "data/Purchasing_preprocessed.csv"
@@ -42,9 +44,9 @@ def run_script(script_path):
         print(f"Unexpected error: {e}")
 
 
-# Main function to choose which model to run
+# Main function to choose which model to run using the Strategy Pattern
 def main():
-    print("Choose a script to run:")
+    print("Choose a model to run:")
     print("1. Adaboosting")
     print("2. Voting")
     print("3. SGD")
@@ -52,27 +54,15 @@ def main():
     print("5. Random Trees Embedding")
     choice = input("Enter 1, 2, 3, 4, or 5: ").strip()
 
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    adaboosting_path = os.path.join(base_dir, "models", "adaboosting", "adaboosting.py")
-    voting_path = os.path.join(base_dir, "models", "voting", "voting.py")
-    sgd_path = os.path.join(base_dir, "models", "sgd", "sgd.py")
-    hist_gb = os.path.join(base_dir, "models", "hist_gb", "hist_gb.py")
-    random_trees_embedding = os.path.join(
-        base_dir, "models", "random_trees_embedding", "random_trees_embedding.py"
-    )
+    # Create the strategy based on the user input
+    classifier_factory = ClassifierFactory()
+    strategy = classifier_factory.get_strategy(choice)
 
-    if choice == "1":
-        run_script(adaboosting_path)
-    elif choice == "2":
-        run_script(voting_path)
-    elif choice == "3":
-        run_script(sgd_path)
-    elif choice == "4":
-        run_script(hist_gb)
-    elif choice == "5":
-        run_script(random_trees_embedding)
-    else:
-        print("Invalid choice. Pick 1, 2, 3, 4, or 5.")
+    # Create a ClassifierContext to use the selected strategy
+    context = ClassifierContext(strategy)
+
+    # Run the selected model using the context
+    context.run_classifier_model()
 
 
 if __name__ == "__main__":

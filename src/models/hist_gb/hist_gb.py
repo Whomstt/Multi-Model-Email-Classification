@@ -5,6 +5,8 @@ from sklearn.ensemble import HistGradientBoostingClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, classification_report
 from sklearn.impute import SimpleImputer
+import joblib
+
 
 # Function to load preprocessed data from multiple files
 def load_data(file_paths):
@@ -75,10 +77,11 @@ def main():
     print("Evaluating the model...")
     evaluate_model(model, X_test, y_test)
 
-    # Optional: Save the model if needed
-    # import joblib
-    # joblib.dump(model, "hist_gb_model.pkl")
-    # print("Model saved to hist_gb_model.pkl")
+    # Save the model 
+    model_path = os.path.join("src","models", "hist_gb", "hist_gb_model.pkl")  
+    print(f"Saving the model to {model_path}...")
+    joblib.dump(model, model_path)
+    print(f"Model saved to {model_path}")
 
 
 # Run the script
