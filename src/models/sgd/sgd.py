@@ -5,6 +5,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, classification_report
 from sklearn.impute import SimpleImputer
 import os
+import joblib
 
 
 
@@ -51,11 +52,10 @@ def evaluate_model(model, X_test, y_test):
 def main():
     # Paths to your preprocessed CSV files
 
-    os.chdir(r"C:\Users\daraf\Documents\GitHub\CS4125-Project")
+    
     file_paths = [
         "data/AppGallery_preprocessed.csv",
         "data/Purchasing_preprocessed.csv",
-
     ]
 
     print("Absolute file paths:")
@@ -85,10 +85,11 @@ def main():
     print("Evaluating the model...")
     evaluate_model(model, X_test, y_test)
 
-    # Save the model if needed (optional)
-    # import joblib
-    # joblib.dump(model, "sgd_model.pkl")
-    # print("Model saved to sgd_model.pkl")
+    # Save the model 
+    model_path = os.path.join("src","models", "sgd", "sgd_model.pkl")  
+    print(f"Saving the model to {model_path}...")
+    joblib.dump(model, model_path)
+    print(f"Model saved to {model_path}")
 
 # Run the script
 if __name__ == "__main__":

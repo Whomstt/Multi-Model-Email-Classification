@@ -6,7 +6,8 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, classification_report
 from sklearn.impute import SimpleImputer
-
+import joblib
+import os
 
 # Function to load preprocessed data from multiple files
 def load_data(file_paths):
@@ -84,6 +85,12 @@ def main():
     # Evaluate the model
     print("Evaluating the model...")
     evaluate_model(model, X_test, y_test)
+
+    # Save the model 
+    model_path = os.path.join("src","models", "voting", "voting.pkl")  
+    print(f"Saving the model to {model_path}...")
+    joblib.dump(model, model_path)
+    print(f"Model saved to {model_path}")
 
 
 # Run the script
