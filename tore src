@@ -1,0 +1,41 @@
+[33mcommit c514df11a539d30d7752b481248854db58da7128[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32msgd[m[33m)[m
+Author: D4RA <101725672+D4RA@users.noreply.github.com>
+Date:   Wed Nov 20 16:05:04 2024 +0000
+
+    paths
+
+[33mcommit ffb9a2fc9724940d6ab2e6b4bcb53a19047a5f11[m[33m ([m[1;31morigin/sgd[m[33m, [m[1;31morigin/mo/hist_gb[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m
+Author: Cathal <100219998+Whomstt@users.noreply.github.com>
+Date:   Wed Nov 20 14:48:01 2024 +0000
+
+    Rename Preprocessing.py to preprocessing.py
+
+[33mcommit 13a77c6071598a61a9e9ec0b62df96adae495702[m
+Author: Cathal <cathalcrowepatrick@gmail.com>
+Date:   Wed Nov 20 14:47:36 2024 +0000
+
+    tidy
+
+[33mcommit c1dbf436c46f8fc31c29b2f27a9592e3bed90acf[m
+Author: Brazonik <anikmohammad02@gmail.com>
+Date:   Wed Nov 20 14:45:49 2024 +0000
+
+    preprocessing
+
+[33mcommit 4e3dcb9269c037b65a78ad0a4afa78b44fad15de[m
+Author: Cathal <cathalcrowepatrick@gmail.com>
+Date:   Wed Nov 20 14:10:16 2024 +0000
+
+    Structure change and csv files
+
+[33mcommit d433c73a9864f64fe317562b514f483e08320fcd[m
+Author: Cathal <cathalcrowepatrick@gmail.com>
+Date:   Wed Nov 20 14:02:37 2024 +0000
+
+    temp files to allow visibile folders
+
+[33mcommit e7b6687bedf4b49a737f685fd1a0781884514447[m
+Author: Cathal <cathalcrowepatrick@gmail.com>
+Date:   Wed Nov 20 14:00:53 2024 +0000
+
+    Modified Skeleton
