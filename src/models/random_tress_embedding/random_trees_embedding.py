@@ -9,24 +9,14 @@ from sklearn.pipeline import Pipeline
 from sklearn.linear_model import LogisticRegression
 
 def load_data(file_paths):
-    """Load and combine data from multiple preprocessed CSV files."""
     dataframes = [pd.read_csv(file) for file in file_paths]
     combined_df = pd.concat(dataframes, axis=0, ignore_index=True)
     X = combined_df.iloc[:, :-1].values
     y = combined_df.iloc[:, -1].values
     return X, y
 
+#ML Pipeline with random trees embedding
 def create_random_trees_embedding_pipeline(n_estimators=100, max_depth=5):
-    """
-    Create a machine learning pipeline with Random Trees Embedding and Logistic Regression.
-    
-    Parameters:
-    - n_estimators: Number of trees in the embedding
-    - max_depth: Maximum depth of the trees
-    
-    Returns:
-    - Scikit-learn pipeline
-    """
     pipeline = Pipeline([
         ('imputer', SimpleImputer(strategy='mean')),
         ('scaler', StandardScaler()),
@@ -44,9 +34,6 @@ def create_random_trees_embedding_pipeline(n_estimators=100, max_depth=5):
     return pipeline
 
 def train_and_evaluate_model(X_train, X_test, y_train, y_test, pipeline):
-    """
-    Train the Random Trees Embedding model and evaluate its performance.
-    """
     pipeline.fit(X_train, y_train)
     y_pred = pipeline.predict(X_test)
     
