@@ -2,6 +2,7 @@ import os
 import sys
 import subprocess
 import sys
+
 print(sys.path)
 from patterns.strategy.ClassifierContext import ClassifierContext
 from patterns.factory.ClassifierFactory import ClassifierFactory  # Import the factory
@@ -66,6 +67,9 @@ def main():
 
     # Run the selected model using the context
     context.run_classifier_model()
+
+    # Finished running the model
+    print("Finished running the model.")
 
 
 if __name__ == "__main__":
