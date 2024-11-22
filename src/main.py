@@ -6,6 +6,8 @@ import sys
 print(sys.path)
 from patterns.strategy.ClassifierContext import ClassifierContext
 from patterns.factory.ClassifierFactory import ClassifierFactory  # Import the factory
+import preprocessing
+import preprocessing_unseen
 
 
 # Paths for the preprocessed CSV files
@@ -13,23 +15,12 @@ purchasing_file = "data/Purchasing_preprocessed.csv"
 appgallery_file = "data/AppGallery_preprocessed.csv"
 
 
-# Function to check if the files exist
-def check_files_exist():
-    return os.path.exists(purchasing_file) and os.path.exists(appgallery_file)
-
-
 # Run preprocessing script
 def run_preprocessing():
-    # Running the preprocessing.py script
-    subprocess.run(["python", "src/preprocessing.py"], check=True)
-
-
-# Check if preprocessed files exist, else run preprocessing
-if not check_files_exist():
-    print("Preprocessed CSV files not found. Running preprocessing...")
-    run_preprocessing()
-else:
-    print("Preprocessed CSV files found. Proceeding with the rest of the program.")
+    if not os.path.exists(purchasing_file):
+        preprocessing.preprocess_data("data/Purchasing.csv")
+    elif not os.path.exists(appgallery_file):
+        preprocessing.preprocess_data("data/AppGallery.csv")
 
 
 # Run our model scripts
@@ -50,6 +41,10 @@ def run_script(script_path):
 
 # Main function to choose which model to run using the Strategy Pattern
 def main():
+    # Run preprocessing (includes checking if preprocessed files exist)
+    run_preprocessing()
+
+    print("Preprocessed CSV files found. Proceeding with the rest of the program.")
     print("Choose a model to run:")
     print("1. Adaboosting")
     print("2. Voting")
