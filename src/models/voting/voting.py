@@ -9,6 +9,7 @@ from sklearn.impute import SimpleImputer
 import joblib
 import os
 
+
 # Function to load preprocessed data from multiple files
 def load_data(file_paths):
     """Load and combine data from multiple preprocessed CSV files."""
@@ -86,8 +87,8 @@ def main():
     print("Evaluating the model...")
     evaluate_model(model, X_test, y_test)
 
-    # Save the model 
-    model_path = os.path.join("src","models", "voting", "voting.pkl")  
+    # Save the model
+    model_path = os.path.join("src", "models", "voting", "voting_model.pkl")
     print(f"Saving the model to {model_path}...")
     joblib.dump(model, model_path)
     print(f"Model saved to {model_path}")
