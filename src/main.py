@@ -68,6 +68,9 @@ def main():
     # Run the selected model using the context
     context.run_classifier_model()
 
+    # Finished running the model
+    print("Finished running the model.")
+
 
 if __name__ == "__main__":
     main()
