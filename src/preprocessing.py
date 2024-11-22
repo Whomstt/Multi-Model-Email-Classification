@@ -155,8 +155,3 @@ def trans_to_en(texts):
 
         text_en_l.append(text_en)
     return text_en_l
-
-
-# Process both files
-preprocess_data("data\\AppGallery.csv")
-preprocess_data("data\\Purchasing.csv")
