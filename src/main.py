@@ -13,7 +13,9 @@ def main():
 
     invoker.add_command(PreprocessCommand())
 
-    print("Choose a model to run:")
+    print(
+        "Choose a model to run after placing your Email.csv\nin the data folder that you want classified:"
+    )
     print("1. Adaboosting")
     print("2. Voting")
     print("3. SGD")

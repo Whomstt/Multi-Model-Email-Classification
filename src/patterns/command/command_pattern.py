@@ -49,6 +49,7 @@ class Invoker:
 # Paths for the preprocessed CSV files
 purchasing_file = "data/Purchasing_preprocessed.csv"
 appgallery_file = "data/AppGallery_preprocessed.csv"
+email_file = "data/Email_preprocessed.csv"
 
 
 # Run preprocessing script
@@ -56,6 +57,9 @@ def run_preprocessing():
     if not os.path.exists(purchasing_file):
         print("Preprocessing Purchasing data...")
         preprocessing.preprocess_data("data/Purchasing.csv")
-    elif not os.path.exists(appgallery_file):
+    if not os.path.exists(appgallery_file):
         print("Preprocessing AppGallery data...")
         preprocessing.preprocess_data("data/AppGallery.csv")
+    if not os.path.exists(email_file):
+        print("Preprocessing Email data...")
+        preprocessing.preprocess_data("data/Email.csv")
