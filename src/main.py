@@ -1,8 +1,5 @@
 import sys
 
-print(sys.path)
-from patterns.strategy.ClassifierContext import ClassifierContext
-from patterns.factory.ClassifierFactory import ClassifierFactory  # Import the factory
 from patterns.command.command_pattern import (
     PreprocessCommand,
     Invoker,
