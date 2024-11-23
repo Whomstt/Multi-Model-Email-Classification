@@ -4,6 +4,9 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
 from transformers import M2M100ForConditionalGeneration, M2M100Tokenizer
 import stanza
+import joblib
+import os
+import re
 
 
 # Updated Function for Data Preprocessing
@@ -83,6 +86,9 @@ def preprocess_data(file_name):
     x2 = tfidfconverter.fit_transform(temp["ts_en"]).toarray()
     X = np.concatenate((x1, x2), axis=1)
 
+    # Save the TF-IDF vectorizer to a file
+    joblib.dump(tfidfconverter, "tfidf_vectorizer.pkl")
+
     # 6. Dealing with Data Imbalance
     y_series = pd.Series(y)
     good_y_value = y_series.value_counts()[y_series.value_counts() >= 3].index
@@ -122,7 +128,6 @@ def trans_to_en(texts):
     lang_fallback = {
         "nn": "no",  # Map Norwegian Nynorsk to Norwegian Bokmål
         "fro": "fr",  # Old French to modern French
-        # Add more mappings if needed
     }
 
     text_en_l = []
@@ -155,3 +160,37 @@ def trans_to_en(texts):
 
         text_en_l.append(text_en)
     return text_en_l
+
+
+def preprocess_single_email(email_text, tfidf_vectorizer_path="tfidf_vectorizer.pkl"):
+    """
+    Preprocess a single email to match the vectorized structure of training data.
+    """
+    # Apply noise removal (replicate logic from batch preprocessing)
+    noise_patterns = [
+        r"(from :)|(subject :)|(sent :)|(r\s*:)|(re\s*:)",
+        r"(january|february|march|april|may|june|july|august|september|october|november|december)",
+        r"(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)",
+        r"(monday|tuesday|wednesday|thursday|friday|saturday|sunday)",
+        r"\d{2}(:|.)\d{2}",
+        r"(xxxxx@xxxx\.com)|(\*{5}\([a-z]+\))",
+        r"\d+",
+        r"[^0-9a-zA-Z]+",
+        r"(\s|^).(\s|$)",
+    ]
+    for noise in noise_patterns:
+        email_text = re.sub(noise, " ", email_text.lower())  # Use re.sub for regex replacements
+        email_text = re.sub(r"\s+", " ", email_text).strip()  # Clean up any excess spaces
+
+    # Load pre-fitted TfidfVectorizer
+    if not os.path.exists(tfidf_vectorizer_path):
+        raise FileNotFoundError(f"TfidfVectorizer not found at {tfidf_vectorizer_path}.")
+    
+    tfidf_vectorizer = joblib.load(tfidf_vectorizer_path)
+
+    # Translate the email to English using the same translation method as batch
+    email_text_en = trans_to_en([email_text])[0]
+
+    # Transform email text into vectorized features
+    email_features = tfidf_vectorizer.transform([email_text_en]).toarray()
+    return email_features

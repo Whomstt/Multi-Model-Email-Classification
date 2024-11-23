@@ -29,7 +29,7 @@ class Hist_gbStrategy(ClassifierStrategy):
             model = joblib.load(model_path)
             return model
 
-    def get_model(self) -> HistGradientBoostingClassifier:
+    def get_model(self, email_features) -> HistGradientBoostingClassifier:
         """Return the loaded hist_gb model."""
         return self.model
 

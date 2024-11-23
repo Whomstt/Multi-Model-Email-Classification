@@ -27,7 +27,7 @@ class SgdStrategy(ClassifierStrategy):
             model = joblib.load(model_path)
             return model
 
-    def get_model(self) -> SGDClassifier:
+    def get_model(self, email_features) -> SGDClassifier:
         """Return the loaded SGD model."""
         return self.model
 

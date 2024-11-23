@@ -1,14 +1,15 @@
 from sklearn.ensemble import AdaBoostClassifier
-from sklearn.tree import DecisionTreeClassifier
 import joblib
 import os
 from patterns.strategy.ClassifierStrategy import ClassifierStrategy
 import subprocess
 
 
-class AdaBoostStrategy(ClassifierStrategy):  # Ensure it inherits from ModelStrategy
+class AdaBoostStrategy(ClassifierStrategy):
     def __init__(self):
+        # Define the path to the pre-trained model
         model_path = os.path.join("src", "models", "adaboosting", "adaboost_model.pkl")
+        # Load the pre-trained model from the given path
         self.model = self.load_model(model_path)
 
     def load_model(self, model_path):
@@ -20,16 +21,14 @@ class AdaBoostStrategy(ClassifierStrategy):  # Ensure it inherits from ModelStra
         else:
             # If the model file does not exist, create it
             print(f"Model file not found at {model_path}")
-            adaboosting_path = os.path.join(
-                "src", "models", "adaboosting", "adaboosting.py"
-            )
-            print(f"Running {adaboosting_path} to create the model...")
-            subprocess.run(["python", adaboosting_path], check=True)
+            voting_script_path = os.path.join("src", "models", "voting", "voting.py")
+            print(f"Running {voting_script_path} to create the model...")
+            subprocess.run(["python", voting_script_path], check=True)
             model = joblib.load(model_path)
             return model
 
-    def get_model(self) -> AdaBoostClassifier:
-        """Return the loaded AdaBoost model."""
+    def get_model(self, email_features) -> AdaBoostClassifier:
+        """Return the loaded voting model."""
         return self.model
 
     def predict(self, X):
