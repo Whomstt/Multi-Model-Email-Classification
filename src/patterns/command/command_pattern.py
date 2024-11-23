@@ -57,9 +57,9 @@ def run_preprocessing():
     if not os.path.exists(purchasing_file):
         print("Preprocessing Purchasing data...")
         preprocessing.preprocess_data("data/Purchasing.csv")
-    elif not os.path.exists(appgallery_file):
+    if not os.path.exists(appgallery_file):
         print("Preprocessing AppGallery data...")
         preprocessing.preprocess_data("data/AppGallery.csv")
-    elif not os.path.exists(email_file):
+    if not os.path.exists(email_file):
         print("Preprocessing Email data...")
         preprocessing.preprocess_data("data/Email.csv")
