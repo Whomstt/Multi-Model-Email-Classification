@@ -1,5 +1,5 @@
 import sys
-
+from patterns.singleton.ConfigurationManager import ConfigurationManager
 from patterns.command.command_pattern import (
     PreprocessCommand,
     Invoker,
@@ -9,6 +9,7 @@ from patterns.command.command_pattern import (
 
 # Main function
 def main():
+    config_manager = ConfigurationManager()
     invoker = Invoker()
 
     invoker.add_command(PreprocessCommand())
