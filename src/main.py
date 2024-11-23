@@ -22,7 +22,15 @@ def main():
     print("3. SGD")
     print("4. Hist Gradient Boosting")
     print("5. Random Trees Embedding")
-    choice = input("Enter 1, 2, 3, 4, or 5: ").strip()
+    choice = input("Enter 1, 2, 3, 4, or 5: ").strip
+
+    valid_choices = {"1", "2", "3", "4", "5"}  # Set of valid inputs
+    choice = None
+
+    while choice not in valid_choices:
+        choice = input("Enter 1, 2, 3, 4, or 5: ").strip()
+        if choice not in valid_choices:
+            print("Invalid input. Please enter a number between 1 and 5.")
 
     invoker.add_command(RunClassifierCommand(choice))
 
