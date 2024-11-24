@@ -2,11 +2,10 @@ import pandas as pd
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
-from transformers import M2M100ForConditionalGeneration, M2M100Tokenizer
-import stanza
-import joblib
-import os
-import re
+
+
+
+from patterns.singleton.TranslationManager import TranslationManager
 
 
 # Updated Function for Data Preprocessing
@@ -38,8 +37,9 @@ def preprocess_data(file_name):
     temp = df.copy()
     y = temp["y"].to_numpy()
 
-    # 3. Translation
-    temp["ts_en"] = trans_to_en(temp["Ticket Summary"].tolist())
+    # 3. Translation (Using TranslationManager)
+    translator = TranslationManager()  # Access the singleton
+    temp["ts_en"] = translator.translate_to_en(temp["Ticket Summary"].tolist())
 
     # 4. Noise Removal
     temp["ts"] = (
@@ -114,83 +114,4 @@ def preprocess_data(file_name):
     print(f"Preprocessed data saved to {output_file}")
 
 
-# Translation Function
-def trans_to_en(texts):
-    t2t_m = "facebook/m2m100_418M"
-    model = M2M100ForConditionalGeneration.from_pretrained(t2t_m)
-    tokenizer = M2M100Tokenizer.from_pretrained(t2t_m)
 
-    # Initialize Stanza pipeline for language identification
-    stanza.download("multilingual")  # Ensure multilingual resources are downloaded
-    nlp_stanza = stanza.Pipeline(lang="multilingual", processors="langid")
-
-    # Define a language fallback map for unsupported codes
-    lang_fallback = {
-        "nn": "no",  # Map Norwegian Nynorsk to Norwegian Bokmål
-        "fro": "fr",  # Old French to modern French
-    }
-
-    text_en_l = []
-    for text in texts:
-        if text == "":  # Skip empty texts
-            text_en_l.append(text)
-            continue
-
-        try:
-            # Detect language
-            doc = nlp_stanza(text)
-            lang = doc.lang
-            lang = lang_fallback.get(lang, lang)
-
-            # Translate if not English
-            if lang != "en":
-                tokenizer.src_lang = lang
-                encoded = tokenizer(text, return_tensors="pt")
-                generated_tokens = model.generate(
-                    **encoded, forced_bos_token_id=tokenizer.get_lang_id("en")
-                )
-                text_en = tokenizer.batch_decode(
-                    generated_tokens, skip_special_tokens=True
-                )[0]
-            else:
-                text_en = text
-        except Exception as e:
-            print(f"Error processing text: {text}, {str(e)}")
-            text_en = text  # Return the original text if translation fails
-
-        text_en_l.append(text_en)
-    return text_en_l
-
-
-def preprocess_single_email(email_text, tfidf_vectorizer_path="tfidf_vectorizer.pkl"):
-    """
-    Preprocess a single email to match the vectorized structure of training data.
-    """
-    # Apply noise removal (replicate logic from batch preprocessing)
-    noise_patterns = [
-        r"(from :)|(subject :)|(sent :)|(r\s*:)|(re\s*:)",
-        r"(january|february|march|april|may|june|july|august|september|october|november|december)",
-        r"(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)",
-        r"(monday|tuesday|wednesday|thursday|friday|saturday|sunday)",
-        r"\d{2}(:|.)\d{2}",
-        r"(xxxxx@xxxx\.com)|(\*{5}\([a-z]+\))",
-        r"\d+",
-        r"[^0-9a-zA-Z]+",
-        r"(\s|^).(\s|$)",
-    ]
-    for noise in noise_patterns:
-        email_text = re.sub(noise, " ", email_text.lower())  # Use re.sub for regex replacements
-        email_text = re.sub(r"\s+", " ", email_text).strip()  # Clean up any excess spaces
-
-    # Load pre-fitted TfidfVectorizer
-    if not os.path.exists(tfidf_vectorizer_path):
-        raise FileNotFoundError(f"TfidfVectorizer not found at {tfidf_vectorizer_path}.")
-    
-    tfidf_vectorizer = joblib.load(tfidf_vectorizer_path)
-
-    # Translate the email to English using the same translation method as batch
-    email_text_en = trans_to_en([email_text])[0]
-
-    # Transform email text into vectorized features
-    email_features = tfidf_vectorizer.transform([email_text_en]).toarray()
-    return email_features
