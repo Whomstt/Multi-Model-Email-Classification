@@ -25,13 +25,11 @@ def create_random_trees_embedding_pipeline(n_estimators=100, max_depth=5):
         ('scaler', StandardScaler()),
         ('random_trees_embedding', RandomTreesEmbedding(
             n_estimators=n_estimators,
-            max_depth=max_depth,
-            random_state=42
+            max_depth=max_depth
         )),
         ('classifier', LogisticRegression(
             max_iter=1000,
-            solver='liblinear',
-            random_state=42
+            solver='liblinear'
         ))
     ])
     return pipeline
@@ -39,6 +37,7 @@ def create_random_trees_embedding_pipeline(n_estimators=100, max_depth=5):
 def train_and_evaluate_model(X_train, X_test, y_train, y_test, pipeline):
     pipeline.fit(X_train, y_train)
     y_pred = pipeline.predict(X_test)
+    #trains model to predict y values
     
     accuracy = accuracy_score(y_test, y_pred)
     print(f"Accuracy: {accuracy:.2f}")
@@ -58,13 +57,13 @@ def main():
 
     print("Splitting data into training and testing sets...")
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, stratify=y
+        X, y, test_size=0.2, stratify=y #20% of data is used for testing
     )
 
     print("Creating Random Trees Embedding pipeline...")
     random_trees_pipeline = create_random_trees_embedding_pipeline(
         n_estimators=100,
-        max_depth=5
+        max_depth=5 #tree depth
     )
 
     print("Training and evaluating the model...")
@@ -72,7 +71,7 @@ def main():
         X_train, X_test, y_train, y_test, random_trees_pipeline
     )
 
-    # Save the model 
+    # Saves the model so it can be called later
     model_path = os.path.join("src","models", "random_trees_embedding", "random_trees_embedding_model.pkl")  
     print(f"Saving the model to {model_path}...")
     joblib.dump(trained_model, model_path)
