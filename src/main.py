@@ -8,7 +8,7 @@ from patterns.command.command_pattern import (
 
 # Main function to run the program
 def main():
-    config_mnager = ConfigurationManager()
+    config_manger = ConfigurationManager()
     # Set up our Command Invoker
     invoker = Invoker()
 
