@@ -19,7 +19,7 @@ def load_data(file_paths):
     return X, y
 
 #ML Pipeline with random trees embedding
-def create_random_trees_embedding_pipeline(n_estimators=100, max_depth=5):
+def create_random_trees_embedding_pipeline(n_estimators=200, max_depth=5):
     pipeline = Pipeline([
         ('imputer', SimpleImputer(strategy='mean')),
         ('scaler', StandardScaler()),
@@ -63,7 +63,7 @@ def main():
     print("Creating Random Trees Embedding pipeline...")
     random_trees_pipeline = create_random_trees_embedding_pipeline(
         n_estimators=100,
-        max_depth=5 #tree depth
+        max_depth=5 
     )
 
     print("Training and evaluating the model...")
