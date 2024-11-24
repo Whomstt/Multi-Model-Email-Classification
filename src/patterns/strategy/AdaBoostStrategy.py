@@ -21,7 +21,9 @@ class AdaBoostStrategy(ClassifierStrategy):
         else:
             # If the model file does not exist, create it
             print(f"Model file not found at {model_path}")
-            voting_script_path = os.path.join("src", "models", "voting", "voting.py")
+            voting_script_path = os.path.join(
+                "src", "models", "adaboosting", "adaboosting.py"
+            )
             print(f"Running {voting_script_path} to create the model...")
             subprocess.run(["python", voting_script_path], check=True)
             model = joblib.load(model_path)
