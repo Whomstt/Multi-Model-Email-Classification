@@ -6,6 +6,12 @@ import preprocessing
 import numpy as np
 import os
 import pandas as pd
+from patterns.decorator.classifier_decorator import (
+    LoggingDecorator,
+    TimingDecorator,
+    ValidationDecorator
+)
+
 
 
 # Command interface
@@ -38,6 +44,9 @@ class RunClassifierCommand(Command):
         print(f"Loading data from {self.csv_path}...")
         self._results = self.classify_emails_from_csv(self.csv_path, strategy)
 
+        # Only modify the classify_emails_from_csv method in RunClassifierCommand
+
+
     def classify_emails_from_csv(self, csv_path: str, strategy):
         # Load the preprocessed CSV
         email_data = pd.read_csv(csv_path)
@@ -45,9 +54,15 @@ class RunClassifierCommand(Command):
         # Extract features
         X = email_data.iloc[:, :-1].values
 
-        # Context to use the strategy for prediction
-        context = ClassifierContext(strategy)
+        # Create context with decorated strategy
+        decorated_strategy = ValidationDecorator(strategy)  # Add validation
+        decorated_strategy = TimingDecorator(decorated_strategy)  # Add timing
+        decorated_strategy = LoggingDecorator(decorated_strategy)
+
+        # Create context with decorated strategy
+        context = ClassifierContext(decorated_strategy)
         predictions = context.run_classifier_model(X)
+
 
         return predictions
 
