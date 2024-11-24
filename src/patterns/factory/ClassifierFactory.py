@@ -4,6 +4,7 @@ from patterns.strategy.SgdStrategy import SgdStrategy
 from patterns.strategy.Hist_gbStrategy import Hist_gbStrategy
 from patterns.strategy.RandomTreesStrategy import RandomTreesStrategy
 
+#Returns the startegy the user selected in main
 class ClassifierFactory:
     def get_strategy(self, choice):
         """Return the appropriate strategy based on user input."""

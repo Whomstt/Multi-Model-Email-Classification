@@ -30,9 +30,9 @@ def handle_missing_values(X):
 def train_voting_classifier(X_train, y_train):
 
     # Define base estimators
-    estimator1 = DecisionTreeClassifier(max_depth=5)
-    estimator2 = RandomForestClassifier(n_estimators=50, random_state=42)
-    estimator3 = LogisticRegression(max_iter=1000)
+    estimator1 = DecisionTreeClassifier(max_depth=2)
+    estimator2 = RandomForestClassifier(n_estimators=70)
+    estimator3 = LogisticRegression(max_iter=100)
 
     # Create the Voting Classifier
     voting_model = VotingClassifier(
@@ -73,7 +73,7 @@ def main():
     # Split the data into training and testing sets
     print("Splitting data into training and testing sets...")
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=42, stratify=y
+        X, y, test_size=0.2, stratify=y
     )
 
     # Train the Voting Classifier

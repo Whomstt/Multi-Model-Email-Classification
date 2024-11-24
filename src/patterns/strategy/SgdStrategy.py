@@ -15,7 +15,7 @@ class SgdStrategy(ClassifierStrategy):
     def load_model(self, model_path):
         """Load the pre-trained model from the specified path."""
         if os.path.exists(model_path):
-            model = joblib.load(model_path)  # Load the model using joblib
+            model = joblib.load(model_path)  
             print(f"Loaded sgd model from {model_path}")
             return model
         else:

@@ -28,10 +28,9 @@ def handle_missing_values(X):
 def train_hist_gb(X_train, y_train):
     """Train a HistGradientBoostingClassifier."""
     hist_gb_model = HistGradientBoostingClassifier(
-        max_iter=100,       # Number of boosting iterations
-        learning_rate=0.1,  # Learning rate
+        max_iter=1000,       # Number of boosting iterations
+        learning_rate=0.5,  # Learning rate
         max_depth=10,       # Maximum tree depth
-        random_state=42     # Random seed for reproducibility
     )
     # Train the model
     hist_gb_model.fit(X_train, y_train)
@@ -66,7 +65,7 @@ def main():
     # Split the data into training and testing sets
     print("Splitting data into training and testing sets...")
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=42, stratify=y
+        X, y, test_size=0.2, stratify=y
     )
 
     # Train the HistGradientBoosting model

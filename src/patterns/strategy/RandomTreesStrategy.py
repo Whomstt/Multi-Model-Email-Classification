@@ -20,11 +20,11 @@ class RandomTreesStrategy(ClassifierStrategy):
     def load_model(self, model_path):
         """Load the pre-trained model from the specified path."""
         if os.path.exists(model_path):
-            model = joblib.load(model_path)  # Load the model using joblib
+            model = joblib.load(model_path) 
             print(f"Loaded sgd model from {model_path}")
             return model
         else:
-            # If the model file does not exist, create it
+            
             print(f"Model file not found at {model_path}")
             random_trees_embedding_path = os.path.join(
                 "src", "models", "random_trees_embedding", "random_trees_embedding.py"

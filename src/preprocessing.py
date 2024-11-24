@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
+import joblib
 
 
 
@@ -33,15 +34,15 @@ def preprocess_data(file_name):
     # Remove rows with missing or empty labels
     df = df.loc[(df["y"].notna()) & (df["y"] != "")]
 
-    # 2. Data Grouping
+    #  Data Grouping
     temp = df.copy()
     y = temp["y"].to_numpy()
 
-    # 3. Translation (Using TranslationManager)
+    # Translation (Using TranslationManager)
     translator = TranslationManager()  # Access the singleton
-    temp["ts_en"] = translator.translate_to_en(temp["Ticket Summary"].tolist())
+    temp["ts_en"] = translator.translate_to_english(temp["Ticket Summary"].tolist())
 
-    # 4. Noise Removal
+    #  Noise Removal
     temp["ts"] = (
         temp["Ticket Summary"]
         .str.lower()
@@ -80,7 +81,7 @@ def preprocess_data(file_name):
     good_y1 = temp["y1"].value_counts()[temp["y1"].value_counts() > 10].index
     temp = temp.loc[temp["y1"].isin(good_y1)]
 
-    # 5. Textual Data Representation
+    # Textual Data Representation
     tfidfconverter = TfidfVectorizer(max_features=2000, min_df=4, max_df=0.90)
     x1 = tfidfconverter.fit_transform(temp["Interaction content"]).toarray()
     x2 = tfidfconverter.fit_transform(temp["ts_en"]).toarray()
@@ -89,7 +90,7 @@ def preprocess_data(file_name):
     # Save the TF-IDF vectorizer to a file
     joblib.dump(tfidfconverter, "tfidf_vectorizer.pkl")
 
-    # 6. Dealing with Data Imbalance
+    #  Dealing with Data Imbalance
     y_series = pd.Series(y)
     good_y_value = y_series.value_counts()[y_series.value_counts() >= 3].index
     y = temp["y"]

@@ -14,14 +14,14 @@ def load_data(file_paths):
     """Load and combine data from multiple preprocessed CSV files."""
     dataframes = [pd.read_csv(file) for file in file_paths]
     combined_df = pd.concat(dataframes, axis=0, ignore_index=True)
-    X = combined_df.iloc[:, :-1].values  # Features (all columns except the last one)
-    y = combined_df.iloc[:, -1].values   # Target (last column)
+    X = combined_df.iloc[:, :-1].values  
+    y = combined_df.iloc[:, -1].values   
     return X, y
 
 # Function to handle missing values using SimpleImputer
 def handle_missing_values(X):
     """Handle missing values in feature data."""
-    imputer = SimpleImputer(strategy='mean')  # Fill missing values with the column mean
+    imputer = SimpleImputer(strategy='mean')  
     X_imputed = imputer.fit_transform(X)
     return X_imputed
 
@@ -30,10 +30,9 @@ def train_sgd(X_train, y_train):
     """Train an SGD classifier."""
     # Create the SGD model
     sgd_model = SGDClassifier(
-        loss='log_loss',  # Use logistic regression for classification
-        max_iter=1000,
+        loss='log_loss',  
+        max_iter=500,
         tol=1e-3,
-        random_state=42
     )
     # Train the model
     sgd_model.fit(X_train, y_train)
@@ -74,7 +73,7 @@ def main():
     # Split the data into training and testing sets
     print("Splitting data into training and testing sets...")
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=42, stratify=y
+        X, y, test_size=0.2,  stratify=y
     )
 
     # Train the SGD model

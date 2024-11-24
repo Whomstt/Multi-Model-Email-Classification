@@ -1,6 +1,6 @@
 from sklearn.ensemble import (
     HistGradientBoostingClassifier,
-)  # Import the correct classifier
+)  
 import joblib
 import os
 from patterns.strategy.ClassifierStrategy import ClassifierStrategy
@@ -17,7 +17,7 @@ class Hist_gbStrategy(ClassifierStrategy):
     def load_model(self, model_path):
         """Load the pre-trained model from the specified path."""
         if os.path.exists(model_path):
-            model = joblib.load(model_path)  # Load the model using joblib
+            model = joblib.load(model_path)  
             print(f"Loaded hist_gb model from {model_path}")
             return model
         else:

@@ -13,14 +13,13 @@ def load_data(file_paths):
     """Load and combine data from multiple preprocessed CSV files."""
     dataframes = [pd.read_csv(file) for file in file_paths]
     combined_df = pd.concat(dataframes, axis=0, ignore_index=True)
-    X = combined_df.iloc[:, :-1].values  # Features (all columns except the last one)
-    y = combined_df.iloc[:, -1].values   # Target (last column)
+    X = combined_df.iloc[:, :-1].values  # Features are all columns except the last one
+    y = combined_df.iloc[:, -1].values   # Target set to Type 2
     return X, y
 
-# Function to handle missing values using SimpleImputer
+# Function to handle missing values 
 def handle_missing_values(X):
-    """Handle missing values in feature data."""
-    imputer = SimpleImputer(strategy='mean')  # Fill missing values with the column mean
+    imputer = SimpleImputer(strategy='mean')  
     X_imputed = imputer.fit_transform(X)
     return X_imputed
 
@@ -32,9 +31,8 @@ def train_adaboost(X_train, y_train):
     # Create the AdaBoost model
     adaboost_model = AdaBoostClassifier(
         estimator=estimator,
-        n_estimators=70,  # Number of weak classifiers
+        n_estimators=500,  # Number of weak classifiers
         learning_rate=1.5,
-        random_state=20
     )
     # Train the model
     adaboost_model.fit(X_train, y_train)
@@ -68,7 +66,7 @@ def main():
     # Split the data into training and testing sets
     print("Splitting data into training and testing sets...")
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=42, stratify=y
+        X, y, test_size=0.2, stratify=y
     )
 
     # Train the AdaBoost model
@@ -87,6 +85,6 @@ def main():
     joblib.dump(model, model_path)
     print(f"Model saved to {model_path}")
 
-# Run the script
+
 if __name__ == "__main__":
     main()
