@@ -4,12 +4,28 @@ from patterns.command.command_pattern import (
     Invoker,
     RunClassifierCommand,
 )
+from patterns.factory.ClassifierFactory import ClassifierFactory
+from patterns.observers.ExecutionLogger import ExecutionLogger
+from patterns.observers.ResultsDisplayer import ResultsDisplayer
+from patterns.observers.StatisticsTracker import StatisticsTracker
 
 
 # Main function to run the program
 def main():
     # Set up our Command Invoker
     invoker = Invoker()
+
+    # Initialize observers
+    execution_logger = ExecutionLogger()
+    results_displayer = ResultsDisplayer()
+    statistics_tracker = StatisticsTracker()
+
+    # Adding preprocessing command to the invoker
+    preprocess_command = PreprocessCommand()
+    preprocess_command.add_observer(execution_logger)  # Log preprocessing events
+    preprocess_command.add_observer(results_displayer)  # Display preprocessing progress
+    invoker.add_command(preprocess_command)
+    invoker.execute_commands()
 
     # Ask the user to choose a model
     print(
@@ -35,14 +51,18 @@ def main():
     # Adding preprocessing command to the invoker and executing it
     invoker.add_command(PreprocessCommand())
     invoker.execute_commands()
+    preprocess_command.add_observer(execution_logger)
 
     # Path to the preprocessed email CSV
     email_csv_path = "data/Emails_preprocessed.csv"
 
-    # Adding run classifier command to the invoker and executing it
+    # Adding run classifier command to the invoker
     run_classifier_command = RunClassifierCommand(email_csv_path, choice)
+    run_classifier_command.add_observer(execution_logger)  # Log classification events
+    run_classifier_command.add_observer(results_displayer)  # Display classification results
+    run_classifier_command.add_observer(statistics_tracker)  # Track classification statistics
     invoker.add_command(run_classifier_command)
-    invoker.execute_commands()
+    invoker.execute_commands()  # Execute classification
 
     # Output classification results
     predictions = run_classifier_command.get_results()
@@ -52,6 +72,9 @@ def main():
 
     # Finished running all tasks
     print("Finished running all tasks")
+
+    # Display classification statistics
+    statistics_tracker.display_stats()
 
 
 if __name__ == "__main__":

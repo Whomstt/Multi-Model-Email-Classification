@@ -1,11 +1,12 @@
 from patterns.strategy.ClassifierContext import ClassifierContext
 from patterns.factory.ClassifierFactory import ClassifierFactory
-from patterns.strategy.ClassifierStrategy import ClassifierStrategy
 from abc import ABC, abstractmethod
 import preprocessing
-import numpy as np
-import os
 import pandas as pd
+import os
+from datetime import datetime
+from patterns.observers.observer import Observer, PreprocessingEvent
+
 
 
 # Command interface
@@ -17,10 +18,25 @@ class Command(ABC):
 
 # Command for preprocessing data
 class PreprocessCommand(Command):
+    def __init__(self):
+        # Initialize observers for preprocessing
+        self._observers = []
+
+    def add_observer(self, observer):
+        if observer not in self._observers:
+            self._observers.append(observer)
+
+    def notify_observers(self, message):
+        # Notify only relevant observers
+        for observer in self._observers:
+            if hasattr(observer, 'update_preprocessing'):  # Check for preprocessing-specific method
+                observer.update_preprocessing(message)
+
     def execute(self):
         print("Checking for preprocessed files...")
+        self.notify_observers("Preprocessing started.")
         run_preprocessing()
-
+        self.notify_observers("Preprocessing completed.")
 
 # Command for running the classifier
 class RunClassifierCommand(Command):
@@ -28,6 +44,20 @@ class RunClassifierCommand(Command):
         self.csv_path = csv_path
         self.choice = choice
         self._results = None
+        self._observers = []  # List of observers
+
+    def add_observer(self, observer):
+        if observer not in self._observers:
+            self._observers.append(observer)
+
+    def notify_observers(self, email_content, predicted_class, confidence_scores):
+        event = {
+            "email_content": email_content,
+            "predicted_class": predicted_class,
+            "confidence_scores": confidence_scores,
+        }
+        for observer in self._observers:
+            observer.update(event)
 
     def execute(self):
         # Classifier factory provides the strategy based on the user's choice
@@ -47,11 +77,18 @@ class RunClassifierCommand(Command):
 
         # Context to use the strategy for prediction
         context = ClassifierContext(strategy)
-        predictions = context.run_classifier_model(X)
+        predictions = []
+
+        for email_content, x in zip(email_data["email_content"], X):
+            predicted_class = context.run_classifier_model([x])[0]
+            confidence_scores = dict(
+                zip(strategy.classes_, strategy.predict_proba([x])[0])
+            )
+            self.notify_observers(email_content, predicted_class, confidence_scores)
+            predictions.append(predicted_class)
 
         return predictions
 
-    # Get the results of the command
     def get_results(self):
         if self._results is None:
             raise RuntimeError("Command has not been executed yet.")
