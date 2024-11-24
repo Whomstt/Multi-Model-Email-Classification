@@ -8,42 +8,54 @@ import os
 import pandas as pd
 
 
+# Command interface
 class Command(ABC):
     @abstractmethod
     def execute(self):
         pass
 
+
+# Command for preprocessing data
 class PreprocessCommand(Command):
     def execute(self):
         print("Checking for preprocessed files...")
         run_preprocessing()
 
+
+# Command for running the classifier
 class RunClassifierCommand(Command):
-    def __init__(self, choice: str):
+    def __init__(self, csv_path: str, choice: str):
+        self.csv_path = csv_path
         self.choice = choice
+        self._results = None
 
     def execute(self):
+        # Classifier factory provides the strategy based on the user's choice
         classifier_factory = ClassifierFactory()
         strategy = classifier_factory.get_strategy(self.choice)
-        context = ClassifierContext(strategy)
-        context.run_classifier_model()
+
+        # Classify the emails
+        print(f"Loading data from {self.csv_path}...")
+        self._results = self.classify_emails_from_csv(self.csv_path, strategy)
 
     def classify_emails_from_csv(self, csv_path: str, strategy):
-       """Classify emails from a preprocessed CSV file."""
-       import pandas as pd  # Import pandas to read the CSV
+        # Load the preprocessed CSV
+        email_data = pd.read_csv(csv_path)
 
-       # Load the preprocessed CSV
-       print(f"Loading data from {csv_path}...")
-       email_data = pd.read_csv(csv_path)
+        # Extract features
+        X = email_data.iloc[:, :-1].values
 
-       # Extract features (assume all columns except the last are features)
-       X = email_data.iloc[:, :-1].values
+        # Context to use the strategy for prediction
+        context = ClassifierContext(strategy)
+        predictions = context.run_classifier_model(X)
 
-       # Use the strategy to predict
-       context = ClassifierContext(strategy)
-       predictions = context.run_classifier_model(X)
+        return predictions
 
-       return predictions
+    # Get the results of the command
+    def get_results(self):
+        if self._results is None:
+            raise RuntimeError("Command has not been executed yet.")
+        return self._results
 
 
 # Invoker class to execute commands
@@ -59,12 +71,14 @@ class Invoker:
             command.execute()
         self._commands.clear()
 
+
 # Paths for the preprocessed CSV files
 purchasing_file = "data/Purchasing_preprocessed.csv"
 appgallery_file = "data/AppGallery_preprocessed.csv"
 email_file = "data/Emails_preprocessed.csv"
 
-# Run preprocessing script
+
+# Run preprocessing script includes check for existing preprocessed files
 def run_preprocessing():
     if not os.path.exists(purchasing_file):
         print("Preprocessing Purchasing data...")
