@@ -12,25 +12,23 @@ import os
 
 # Function to load preprocessed data from multiple files
 def load_data(file_paths):
-    """Load and combine data from multiple preprocessed CSV files."""
     dataframes = [pd.read_csv(file) for file in file_paths]
     combined_df = pd.concat(dataframes, axis=0, ignore_index=True)
-    X = combined_df.iloc[:, :-1].values  # Features (all columns except the last one)
-    y = combined_df.iloc[:, -1].values  # Target (last column)
+    X = combined_df.iloc[:, :-1].values
+    y = combined_df.iloc[:, -1].values
     return X, y
 
 
 # Function to handle missing values using SimpleImputer
 def handle_missing_values(X):
-    """Handle missing values in feature data."""
-    imputer = SimpleImputer(strategy="mean")  # Fill missing values with the column mean
+    imputer = SimpleImputer(strategy="mean")
     X_imputed = imputer.fit_transform(X)
     return X_imputed
 
 
-# Function to train Voting Classifier
+# Function to train Voting Classifier with multiple base estimators
 def train_voting_classifier(X_train, y_train):
-    """Train a Voting Classifier with multiple base estimators."""
+
     # Define base estimators
     estimator1 = DecisionTreeClassifier(max_depth=5)
     estimator2 = RandomForestClassifier(n_estimators=50, random_state=42)
@@ -49,7 +47,6 @@ def train_voting_classifier(X_train, y_train):
 
 # Evaluate the model
 def evaluate_model(model, X_test, y_test):
-    """Evaluate the model's performance and print metrics."""
     y_pred = model.predict(X_test)
     accuracy = accuracy_score(y_test, y_pred)
     print(f"Accuracy: {accuracy:.2f}")
