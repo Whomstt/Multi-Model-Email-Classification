@@ -7,7 +7,9 @@ from patterns.command.command_pattern import (
     Invoker,
     RunClassifierCommand,
 )
-from patterns.factory.ClassifierFactory import ClassifierFactory  # Importing ClassifierFactory
+from patterns.factory.ClassifierFactory import (
+    ClassifierFactory,
+)  # Importing ClassifierFactory
 
 
 # main.py
@@ -16,17 +18,16 @@ def main():
     invoker = Invoker()
     invoker.add_command(PreprocessCommand())
 
-    # Execute preprocessing commands
-    invoker.execute_commands()
-
     # Ask the user to choose a model
-    print("Choose a model to run after placing your Email_preprocessed.csv\nin the data folder that you want classified:")
+    print(
+        "Choose a the model that you want to classify your emails with.\nIf you haven't already, replace the Email.csv file with your own data.\nNote: the csv file must be in the same format and renamed to Email.csv."
+    )
     print("1. Adaboosting")
     print("2. Voting")
     print("3. SGD")
     print("4. Hist Gradient Boosting")
     print("5. Random Trees Embedding")
-    
+
     valid_choices = {"1", "2", "3", "4", "5"}
     choice = None
 
@@ -34,6 +35,9 @@ def main():
         choice = input("Enter 1, 2, 3, 4, or 5: ").strip()
         if choice not in valid_choices:
             print("Invalid input. Please enter a number between 1 and 5.")
+
+    # Execute preprocessing commands
+    invoker.execute_commands()
 
     # Get the classifier strategy from the factory
     classifier_factory = ClassifierFactory()
@@ -47,12 +51,16 @@ def main():
 
     # Check if the file exists
     if not os.path.exists(email_csv_path):
-        print(f"Error: {email_csv_path} not found. Please preprocess your email data first.")
+        print(
+            f"Error: {email_csv_path} not found. Please preprocess your email data first."
+        )
         sys.exit(1)
 
     # Classify emails from the preprocessed CSV
     print(f"Classifying emails from {email_csv_path} using the {choice} model...")
-    predictions = run_classifier_command.classify_emails_from_csv(email_csv_path, strategy)
+    predictions = run_classifier_command.classify_emails_from_csv(
+        email_csv_path, strategy
+    )
 
     # Output the results
     print("Classification results:")
