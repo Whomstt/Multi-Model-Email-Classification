@@ -50,7 +50,7 @@ def evaluate_model(model, X_test, y_test):
 
 # Main function
 def main():
-    # Paths to your preprocessed CSV files
+    # Paths to the preprocessed CSV files
 
     
     file_paths = [
