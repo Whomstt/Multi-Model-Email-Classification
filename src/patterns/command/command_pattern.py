@@ -65,7 +65,6 @@ class RunClassifierCommand(Command):
         decorated_strategy = StatisticsDecorator(decorated_strategy)
         decorated_strategy = TimingDecorator(decorated_strategy)
         decorated_strategy = LoggingDecorator(decorated_strategy)
-        # Create context with decorated strategy
         context = ClassifierContext(decorated_strategy)
         predictions = context.run_classifier_model(X)
 
