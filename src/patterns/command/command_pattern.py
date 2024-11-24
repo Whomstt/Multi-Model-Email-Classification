@@ -7,9 +7,14 @@ import numpy as np
 import os
 import pandas as pd
 from patterns.decorator.classifier_decorator import (
-    LoggingDecorator,
+     LoggingDecorator,
     TimingDecorator,
-    ValidationDecorator
+    ValidationDecorator,
+    StatisticsDecorator,
+    ErrorHandlingDecorator,
+    DataNormalizationDecorator,
+    
+    
 )
 
 
@@ -54,11 +59,12 @@ class RunClassifierCommand(Command):
         # Extract features
         X = email_data.iloc[:, :-1].values
 
-        # Create context with decorated strategy
-        decorated_strategy = ValidationDecorator(strategy)  # Add validation
-        decorated_strategy = TimingDecorator(decorated_strategy)  # Add timing
+        decorated_strategy = ValidationDecorator(strategy)
+        decorated_strategy = DataNormalizationDecorator(decorated_strategy)
+        decorated_strategy = ErrorHandlingDecorator(decorated_strategy)
+        decorated_strategy = StatisticsDecorator(decorated_strategy)
+        decorated_strategy = TimingDecorator(decorated_strategy)
         decorated_strategy = LoggingDecorator(decorated_strategy)
-
         # Create context with decorated strategy
         context = ClassifierContext(decorated_strategy)
         predictions = context.run_classifier_model(X)
