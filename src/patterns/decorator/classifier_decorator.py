@@ -19,6 +19,8 @@ class ClassifierDecorator(ClassifierStrategy):
     def predict(self, email_features):
         """Pass through the predict call to decorated classifier"""
         return self._classifier.predict(email_features)
+    
+    
 
 
 class LoggingDecorator(ClassifierDecorator):
@@ -37,6 +39,7 @@ class LoggingDecorator(ClassifierDecorator):
         print(f"[Log] Prediction completed at: {datetime.now()}")
         print("========================\n")
         return predictions
+    
 
 
 class TimingDecorator(ClassifierDecorator):
@@ -55,6 +58,7 @@ class TimingDecorator(ClassifierDecorator):
         print(f"[Timer] Prediction took {end_time - start_time:.2f} seconds")
         print("======================\n")
         return predictions
+    
 
 
 class ValidationDecorator(ClassifierDecorator):
@@ -79,6 +83,7 @@ class ValidationDecorator(ClassifierDecorator):
         print("[Validation] Predictions generated successfully")
         print("===========================\n")
         return predictions
+    
 
 
 class StatisticsDecorator(ClassifierDecorator):
@@ -97,6 +102,7 @@ class StatisticsDecorator(ClassifierDecorator):
             print(f"- {category}: {count} emails ({percentage:.1f}%)")
         print("=========================\n")
         return predictions
+    
 
 
 class ErrorHandlingDecorator(ClassifierDecorator):
@@ -116,6 +122,8 @@ class ErrorHandlingDecorator(ClassifierDecorator):
             print(f"[Error Handler] Error occurred: {str(e)}")
             print("=============================\n")
             return ["Error in prediction"] * len(email_features)
+         
+   
 
 
 class DataNormalizationDecorator(ClassifierDecorator):
@@ -123,7 +131,6 @@ class DataNormalizationDecorator(ClassifierDecorator):
 
     def predict(self, email_features):
         print("\n=== Normalization Decorator ===")
-        # Normalize features to [0,1] range
         normalized_features = (
             (email_features - np.min(email_features))
             / (np.max(email_features) - np.min(email_features))
@@ -131,3 +138,5 @@ class DataNormalizationDecorator(ClassifierDecorator):
         print("[Normalization] Features normalized to [0,1] range")
         print("==============================\n")
         return self._classifier.predict(normalized_features)
+     
+    
