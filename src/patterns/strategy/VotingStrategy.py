@@ -27,7 +27,7 @@ class VotingStrategy(ClassifierStrategy):
             model = joblib.load(model_path)
             return model
 
-    def get_model(self) -> VotingClassifier:
+    def get_model(self, email_features) -> VotingClassifier:
         """Return the loaded voting model."""
         return self.model
 

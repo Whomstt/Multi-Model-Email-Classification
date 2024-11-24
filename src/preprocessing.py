@@ -2,7 +2,11 @@ import pandas as pd
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
+
+
+
 from patterns.singleton.TranslationManager import TranslationManager
+
 
 # Updated Function for Data Preprocessing
 def preprocess_data(file_name):
@@ -82,6 +86,9 @@ def preprocess_data(file_name):
     x2 = tfidfconverter.fit_transform(temp["ts_en"]).toarray()
     X = np.concatenate((x1, x2), axis=1)
 
+    # Save the TF-IDF vectorizer to a file
+    joblib.dump(tfidfconverter, "tfidf_vectorizer.pkl")
+
     # 6. Dealing with Data Imbalance
     y_series = pd.Series(y)
     good_y_value = y_series.value_counts()[y_series.value_counts() >= 3].index
@@ -105,3 +112,6 @@ def preprocess_data(file_name):
     output_file = file_name.replace(".csv", "_preprocessed.csv")
     preprocessed_df.to_csv(output_file, index=False)
     print(f"Preprocessed data saved to {output_file}")
+
+
+

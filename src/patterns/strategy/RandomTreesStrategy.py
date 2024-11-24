@@ -34,7 +34,7 @@ class RandomTreesStrategy(ClassifierStrategy):
             model = joblib.load(model_path)
             return model
 
-    def get_model(self) -> RandomTreesEmbedding:
+    def get_model(self, email_features) -> RandomTreesEmbedding:
         """Return the loaded Random Trees Embedding model."""
         return self.model
 
