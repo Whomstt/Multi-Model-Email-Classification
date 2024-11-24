@@ -14,9 +14,9 @@ class TranslationManager:
         print("Initializing Translation Model and Language Identification Pipeline...")
         self.model = M2M100ForConditionalGeneration.from_pretrained("facebook/m2m100_418M")
         self.tokenizer = M2M100Tokenizer.from_pretrained("facebook/m2m100_418M")
-        stanza.download("multilingual", processors="langid")  # Ensure resources are downloaded
+        stanza.download("multilingual", processors="langid")  
         self.nlp_stanza = stanza.Pipeline(lang="multilingual", processors="langid")
-        self.lang_fallback = {"nn": "no", "fro": "fr"}  # Example: map old languages to modern equivalents
+        self.lang_fallback = {"nn": "no", "fro": "fr"}
 
     def translate_to_english(self, texts):
         translated_texts = []
@@ -26,11 +26,11 @@ class TranslationManager:
                 continue
 
             try:
-                # Detect language
+                # Detects language
                 doc = self.nlp_stanza(text)
                 lang = self.lang_fallback.get(doc.lang, doc.lang)
 
-                # Translate if not English
+                # Translates
                 if lang != "en":
                     self.tokenizer.src_lang = lang
                     encoded = self.tokenizer(text, return_tensors="pt")
@@ -42,7 +42,7 @@ class TranslationManager:
                     text_en = text
             except Exception as e:
                 print(f"Translation error for text: {text}, {str(e)}")
-                text_en = text  # Fallback to original text if translation fails
+                text_en = text  #Incase translation failure
 
             translated_texts.append(text_en)
 
